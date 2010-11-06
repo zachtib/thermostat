@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+import ConfigParser
+import datetime
+import gdata
+import gdata.calendar
+import gdata.calendar.service
+
+class ThermoEvent:
+        def __init__(self, name, value, start, end):
+                self.name = name
+                self.value = value
+                self.start = start
+                self.end = end
+
+if __name__ == '__main__':
+        config = ConfigParser.ConfigParser()
+        config.read('thermostat.conf')
+
+        calendar = config.get('Calendar', 'calendar')
+
+        calendar_service = gdata.calendar.service.CalendarService()
+
+        now = datetime.datetime.now()
+        week = datetime.timedelta(weeks=1)
+
+        start_date = now.strftime('%Y-%m-%d')
+        end_date = (now + week).strftime('%Y-%m-%d')
+
+        query = gdata.calendar.service.CalendarEventQuery(calendar,
+                                                        'public', 'full')
+
+        query.start_min = start_date
+        query.start_max = end_date
+
+        feed = calendar_service.CalendarQuery(query)
+
+        print feed.title.text, 'from %s to %s' % (start_date, end_date)
+
+        events = []
+
+        for event in feed.entry:
+                title = event.title.text
+                content = event.content.text
+                for when in event.when:
+                        start = datetime.datetime.strptime(when.start_time,
+                                        '%Y-%m-%dT%H:%M:%S.000Z')
+                        end = datetime.datetime.strptime(when.end_time,
+                                        '%Y-%m-%dT%H:%M:%S.000Z')
+                events.append(ThermoEvent(title, content, start, end))
+
+        for i, e in enumerate(events):
+                print '%s: %s at %s from %s to %s' % \
+                        (i, e.name, e.value, e.start, e.end)
