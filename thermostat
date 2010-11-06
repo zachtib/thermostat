@@ -47,8 +47,8 @@ if __name__ == '__main__':
                                         '%Y-%m-%dT%H:%M:%S.000Z')
                         end = datetime.datetime.strptime(when.end_time,
                                         '%Y-%m-%dT%H:%M:%S.000Z')
-                events.append(ThermoEvent(title, content, start, end))
-
-        for i, e in enumerate(events):
+                        events.append(ThermoEvent(title, content, start, end))
+        
+        for i, e in enumerate(sorted(events, key=lambda event: event.start)):
                 print '%s: %s at %s from %s to %s' % \
                         (i, e.name, e.value, e.start, e.end)
