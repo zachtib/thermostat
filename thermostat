@@ -13,6 +13,14 @@ class ThermoEvent:
                 self.start = start
                 self.end = end
 
+def datetime_to_336(dt):
+        r = 0
+        r += 48 * dt.weekday()
+        r += 2 * dt.hour
+        if dt.minute >= 30:
+                r += 1
+        return r
+
 if __name__ == '__main__':
         config = ConfigParser.ConfigParser()
         config.read('thermostat.conf')
@@ -49,6 +57,30 @@ if __name__ == '__main__':
                                         '%Y-%m-%dT%H:%M:%S.000Z')
                         events.append(ThermoEvent(title, content, start, end))
         
+        event_bytes = ['00000000'] * 336
+
         for i, e in enumerate(sorted(events, key=lambda event: event.start)):
                 print '%s: %s at %s from %s to %s' % \
                         (i, e.name, e.value, e.start, e.end)
+                try:
+                        value = int(e.value)
+                        if e.name == 'Heat':
+                                b = bin(128 + int(e.value))[2:]
+                        elif e.name == 'Air':
+                                b = bin(int(e.value))[2:]
+                                b = '0' * (8 - len(b)) + b
+                        elif e.name == 'Fan':
+                                b = '11111111'
+                        else:
+                                b = '00000000'
+                except TypeError:
+                        b = '00000000'
+                except ValueError:
+                        b = '00000000'
+
+                start = datetime_to_336(e.start)
+                end = datetime_to_336(e.end)
+                for t in xrange(start, end):
+                        event_bytes[t] = b
+        for i, b in enumerate(event_bytes):
+                print '%s:\t%s' % (i, b)
