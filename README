@@ -1,0 +1,5 @@
+Google Calendar controlled Thermostat
+
+This is the code for controlling a thermostat with Google Calendar. It consists of two components: A Python component that interfaces with Google Calendar and a circuit that controls the thermostat. The Python code sends the needed data to the circuit over a serial cable.
+
+To "program" the thermostat, you add an event to a specific Google Calendar called, for example "Heat 68" to turn on the heat at 68 degrees. Likewise, "Air 72" would turn on the air conditioning at the specified temperature. Other commands are "Fan" and "Off", though for any period of time without a valid calendar event, the system will default to off.
