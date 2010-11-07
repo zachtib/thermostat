@@ -25,10 +25,6 @@ def datetime_to_336(dt):
 def parse_command(string):
         (cmd, val) = string.split()
 
-
-def bin_to_hexstr(array):
-        return ''.join([ hex(int(b, 2))[2:] for b in array ])
-
 if __name__ == '__main__':
         config = ConfigParser.ConfigParser()
         config.read('thermostat.conf')
@@ -67,7 +63,7 @@ if __name__ == '__main__':
                                         '%Y-%m-%dT%H:%M:%S.000Z') - utc_off
                         events.append(ThermoEvent(title, content, start, end))
         
-        event_bytes = ['00000000'] * 336
+        event_bytes = [0] * 336
 
         for i, e in enumerate(sorted(events, key=lambda event: event.start)):
                 print '%s: %s from %s to %s' % \
@@ -77,21 +73,20 @@ if __name__ == '__main__':
                         print name, value
                         value = int(value)
                         if name == 'Heat':
-                                b = bin(128 + int(value))[2:]
+                                b = 128 + int(value)
                         elif name == 'Air':
-                                b = bin(int(value))[2:]
-                                b = '0' * (8 - len(b)) + b
+                                b = int(value)
                         elif name == 'Fan':
-                                b = '11111111'
+                                b = 255 
                         else:
-                                b = '00000000'
+                                b = 0
                 except TypeError:
-                        b = '00000000'
+                        b = 0
                 except ValueError:
-                        b = '00000000'
+                        b = 0
 
                 start = datetime_to_336(e.start)
                 end = datetime_to_336(e.end)
                 for t in xrange(start, end):
                         event_bytes[t] = b
-        print bin_to_hexstr(event_bytes)
+        print event_bytes
