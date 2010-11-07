@@ -70,7 +70,6 @@ if __name__ == '__main__':
                         (i, e.name, e.start, e.end)
                 try:
                         (name, value) = e.name.split()
-                        print name, value
                         value = int(value)
                         if name == 'Heat':
                                 b = 128 + int(value)
